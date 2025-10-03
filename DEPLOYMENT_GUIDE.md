@@ -41,7 +41,7 @@ git add .
 git commit -m "Initial commit - Peer-Connect app"
 
 # Add remote (replace YOUR_USERNAME with your GitHub username)
-git remote add origin https://github.com/YOUR_USERNAME/peer-connect.git
+git remote add origin https://github.com/AlexST51/peer-connect.git
 
 # Push to GitHub
 git branch -M main
@@ -150,9 +150,14 @@ git push
 3. Select your `peer-connect` repository
 4. Configure build settings:
    - **Base directory**: `client`
-   - **Build command**: `npm run build`
-   - **Publish directory**: `client/dist`
+   - **Build command**: `npm install && npm run build`
+   - **Publish directory**: `dist` (relative to base directory)
 5. Click **"Deploy site"**
+
+**IMPORTANT**: If build fails with "cd: client: No such file or directory":
+- Go to **Site settings** → **Build & deploy** → **Build settings**
+- Make sure settings match above exactly
+- The publish directory should be just `dist`, NOT `client/dist`
 
 **Option B: Netlify CLI**
 
