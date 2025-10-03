@@ -1,0 +1,15 @@
+[build]
+  command = "cd client && npm run build"
+  publish = "client/dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# For serverless functions (if needed in future)
+[functions]
+  directory = "netlify/functions"
