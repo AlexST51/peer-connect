@@ -69,6 +69,7 @@ class SocketClient {
 
   // WebRTC signaling methods
   callUser(to, offer, from) {
+    console.log('📞 SOCKET: Calling user', { to, offer, from });
     this.emit('call-user', { to, offer, from });
   }
 
