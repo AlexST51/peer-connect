@@ -47,13 +47,21 @@ export function VideoCall({ contact, onEndCall, webRTC }) {
   // Set up video elements
   useEffect(() => {
     if (localVideoRef.current && localStream) {
+      console.log('📹 Setting local stream:', localStream.getTracks());
       localVideoRef.current.srcObject = localStream;
     }
   }, [localStream]);
 
   useEffect(() => {
     if (remoteVideoRef.current && remoteStream) {
+      console.log('📹 Setting remote stream:', remoteStream.getTracks());
       remoteVideoRef.current.srcObject = remoteStream;
+      // Ensure the video plays
+      remoteVideoRef.current.play().catch(err => {
+        console.error('Error playing remote video:', err);
+      });
+    } else {
+      console.log('📹 Remote stream status:', { hasRef: !!remoteVideoRef.current, hasStream: !!remoteStream });
     }
   }, [remoteStream]);
 
@@ -91,6 +99,7 @@ export function VideoCall({ contact, onEndCall, webRTC }) {
               ref={remoteVideoRef}
               autoPlay
               playsInline
+              muted={false}
               className="w-full h-full object-cover"
             />
           ) : (
