@@ -23,7 +23,8 @@ export function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { incomingCall, startCall, acceptCall, rejectCall } = useWebRTC(user?.id);
+  const webRTCHook = useWebRTC(user?.id);
+  const { incomingCall, startCall, acceptCall, rejectCall, localStream, remoteStream, isCallActive, callStatus, endCall, toggleVideo, toggleAudio } = webRTCHook;
 
   // Load contacts and requests
   useEffect(() => {
@@ -219,7 +220,11 @@ export function Dashboard() {
   }, []);
 
   if (activeCall) {
-    return <VideoCall contact={activeCall} onEndCall={handleEndCall} />;
+    return <VideoCall 
+      contact={activeCall} 
+      onEndCall={handleEndCall}
+      webRTC={webRTCHook}
+    />;
   }
 
   if (activeChat) {

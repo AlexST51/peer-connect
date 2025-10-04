@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { useWebRTC } from '../hooks/useWebRTC';
 import { useTranslation } from '../hooks/useTranslation';
 import { useAuth } from '../context/AuthContext';
 
-export function VideoCall({ contact, onEndCall }) {
+export function VideoCall({ contact, onEndCall, webRTC }) {
   const { user } = useAuth();
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -19,6 +18,7 @@ export function VideoCall({ contact, onEndCall }) {
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [targetLanguage, setTargetLanguage] = useState('en');
 
+  // Use the WebRTC hook passed from Dashboard instead of creating a new instance
   const {
     localStream,
     remoteStream,
@@ -27,7 +27,7 @@ export function VideoCall({ contact, onEndCall }) {
     endCall,
     toggleVideo,
     toggleAudio,
-  } = useWebRTC(user?.id);
+  } = webRTC;
 
   // Temporarily disable translation to fix video call
   const subtitles = [];
