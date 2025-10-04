@@ -240,7 +240,7 @@ export function Dashboard() {
     loadUnreadCounts();
   }, []);
 
-  if (activeCall) {
+  if (activeCall && (callStatus === 'calling' || callStatus === 'connecting' || callStatus === 'connected' || callStatus === 'ringing')) {
     return <VideoCall 
       contact={activeCall} 
       onEndCall={handleEndCall}
