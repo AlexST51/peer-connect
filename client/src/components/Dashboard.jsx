@@ -157,8 +157,8 @@ export function Dashboard() {
   const handleStartCall = async (contact) => {
     try {
       setError(''); // Clear any previous errors
-      setActiveCall(contact);
       await startCall(contact.userId);
+      setActiveCall(contact); // Only set after call is initiated
     } catch (err) {
       setError(err.message || 'Failed to start call');
       setActiveCall(null);
