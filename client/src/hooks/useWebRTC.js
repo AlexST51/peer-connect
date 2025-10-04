@@ -55,35 +55,54 @@ export function useWebRTC(currentUserId) {
 
   // Create peer connection
   const createPeerConnection = useCallback((stream) => {
+    console.log('🔗 Creating peer connection with stream:', stream.getTracks());
     const pc = new RTCPeerConnection(ICE_SERVERS);
 
     // Add local stream tracks to peer connection
     stream.getTracks().forEach((track) => {
+      console.log('➕ Adding track to peer connection:', track.kind, track.id);
       pc.addTrack(track, stream);
     });
 
     // Handle incoming tracks
     pc.ontrack = (event) => {
-      console.log('Received remote track');
+      console.log('📥 Received remote track:', event.track.kind, event.track.id);
+      console.log('📥 Remote streams:', event.streams);
       setRemoteStream(event.streams[0]);
     };
 
     // Handle ICE candidates
     pc.onicecandidate = (event) => {
-      if (event.candidate && remoteUserId.current) {
-        socket.sendIceCandidate(remoteUserId.current, event.candidate);
+      if (event.candidate) {
+        console.log('🧊 ICE candidate generated:', event.candidate.type);
+        if (remoteUserId.current) {
+          socket.sendIceCandidate(remoteUserId.current, event.candidate);
+        }
+      } else {
+        console.log('🧊 ICE gathering complete');
       }
     };
 
     // Handle connection state changes
     pc.onconnectionstatechange = () => {
-      console.log('Connection state:', pc.connectionState);
+      console.log('🔗 Connection state:', pc.connectionState);
       if (pc.connectionState === 'connected') {
         setCallStatus('connected');
         setIsCallActive(true);
       } else if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+        console.log('❌ Connection failed or disconnected');
         endCall();
       }
+    };
+
+    // Handle ICE connection state
+    pc.oniceconnectionstatechange = () => {
+      console.log('🧊 ICE connection state:', pc.iceConnectionState);
+    };
+
+    // Handle signaling state
+    pc.onsignalingstatechange = () => {
+      console.log('📡 Signaling state:', pc.signalingState);
     };
 
     peerConnection.current = pc;
