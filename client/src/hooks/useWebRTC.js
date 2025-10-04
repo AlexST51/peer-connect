@@ -118,7 +118,7 @@ export function useWebRTC(currentUserId) {
     }
 
     try {
-      console.log('🚀 CODE VERSION: 2025-10-04-15:50 🚀');
+      console.log('🚀 CODE VERSION: 2025-10-04-16:22 🚀');
       console.log('Starting call to:', contactId);
       setCallStatus('calling');
       remoteUserId.current = contactId;
