@@ -25,6 +25,14 @@ export function Dashboard() {
 
   const webRTCHook = useWebRTC(user?.id);
   const { incomingCall, startCall, acceptCall, rejectCall, localStream, remoteStream, isCallActive, callStatus, endCall, toggleVideo, toggleAudio } = webRTCHook;
+  
+  // Log incoming call for debugging
+  useEffect(() => {
+    if (incomingCall) {
+      console.log('🔔 INCOMING CALL DETECTED IN DASHBOARD:', incomingCall);
+      alert(`Incoming call from user ID: ${incomingCall.from}`);
+    }
+  }, [incomingCall]);
 
   // Load contacts and requests
   useEffect(() => {
