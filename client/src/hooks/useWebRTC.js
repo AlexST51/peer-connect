@@ -133,8 +133,13 @@ export function useWebRTC(currentUserId) {
       console.log('✅ Offer created successfully');
       
       console.log('Setting local description...');
-      await pc.setLocalDescription(offer);
-      console.log('✅ Local description set successfully');
+      try {
+        await pc.setLocalDescription(offer);
+        console.log('✅ Local description set successfully');
+      } catch (err) {
+        console.error('❌ Error setting local description:', err);
+        throw err;
+      }
 
       console.log('Sending call to user:', contactId, 'from:', currentUserId);
       console.log('Offer SDP:', offer.sdp.substring(0, 100) + '...');

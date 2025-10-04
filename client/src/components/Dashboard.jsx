@@ -157,9 +157,12 @@ export function Dashboard() {
   const handleStartCall = async (contact) => {
     try {
       setError(''); // Clear any previous errors
+      console.log('📞 Dashboard: Starting call to', contact.displayName);
       await startCall(contact.userId);
+      console.log('📞 Dashboard: Call initiated, setting activeCall');
       setActiveCall(contact); // Only set after call is initiated
     } catch (err) {
+      console.error('📞 Dashboard: Call failed:', err);
       setError(err.message || 'Failed to start call');
       setActiveCall(null);
       // Show alert for immediate feedback
@@ -240,7 +243,9 @@ export function Dashboard() {
     loadUnreadCounts();
   }, []);
 
-  if (activeCall && (callStatus === 'calling' || callStatus === 'connecting' || callStatus === 'connected' || callStatus === 'ringing')) {
+  // Only show VideoCall after activeCall is set (which happens after startCall completes)
+  if (activeCall) {
+    console.log('📞 Dashboard: Rendering VideoCall component');
     return <VideoCall 
       contact={activeCall} 
       onEndCall={handleEndCall}
