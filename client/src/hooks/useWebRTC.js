@@ -126,8 +126,9 @@ export function useWebRTC(currentUserId) {
       await pc.setLocalDescription(offer);
 
       console.log('Sending call to user:', contactId, 'from:', currentUserId);
+      console.log('Offer SDP:', offer.sdp.substring(0, 100) + '...');
       socket.callUser(contactId, offer, currentUserId);
-      console.log('Call initiated successfully');
+      console.log('✅ Call initiated successfully - socket.callUser() executed');
     } catch (error) {
       console.error('Error starting call:', error);
       setCallStatus('idle');

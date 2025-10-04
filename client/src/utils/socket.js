@@ -60,10 +60,12 @@ class SocketClient {
   }
 
   emit(event, data) {
+    console.log('🔌 Socket emit attempt:', event, 'connected:', this.socket?.connected);
     if (this.socket?.connected) {
       this.socket.emit(event, data);
+      console.log('✅ Socket emit successful:', event);
     } else {
-      console.warn('Socket not connected, cannot emit:', event);
+      console.error('❌ Socket not connected, cannot emit:', event);
     }
   }
 
