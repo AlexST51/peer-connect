@@ -93,16 +93,22 @@ export function useWebRTC(currentUserId) {
   // Start a call
   const startCall = useCallback(async (contactId) => {
     try {
+      console.log('Starting call to:', contactId);
       setCallStatus('calling');
       remoteUserId.current = contactId;
 
+      console.log('Initializing media...');
       const stream = await initializeMedia();
+      console.log('Media initialized, creating peer connection...');
       const pc = createPeerConnection(stream);
 
+      console.log('Creating offer...');
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
 
+      console.log('Sending call to user:', contactId, 'from:', currentUserId);
       socket.callUser(contactId, offer, currentUserId);
+      console.log('Call initiated successfully');
     } catch (error) {
       console.error('Error starting call:', error);
       setCallStatus('idle');

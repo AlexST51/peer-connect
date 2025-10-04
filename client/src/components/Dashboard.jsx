@@ -33,27 +33,40 @@ export function Dashboard() {
     loadSentRequests();
   }, []);
 
-  // Handle online/offline status updates
+  // Handle online/offline status updates and new messages
   useEffect(() => {
-    socket.on('user-online', ({ userId }) => {
+    const handleUserOnline = ({ userId }) => {
+      console.log('User came online:', userId);
       setContacts(prev =>
         prev.map(contact =>
           contact.userId === userId ? { ...contact, isOnline: true } : contact
         )
       );
-    });
+    };
 
-    socket.on('user-offline', ({ userId }) => {
+    const handleUserOffline = ({ userId }) => {
+      console.log('User went offline:', userId);
       setContacts(prev =>
         prev.map(contact =>
           contact.userId === userId ? { ...contact, isOnline: false } : contact
         )
       );
-    });
+    };
+
+    const handleNewMessage = (message) => {
+      console.log('New message received:', message);
+      // Reload unread counts when new message arrives
+      loadUnreadCounts();
+    };
+
+    socket.on('user-online', handleUserOnline);
+    socket.on('user-offline', handleUserOffline);
+    socket.on('new-message', handleNewMessage);
 
     return () => {
-      socket.off('user-online');
-      socket.off('user-offline');
+      socket.off('user-online', handleUserOnline);
+      socket.off('user-offline', handleUserOffline);
+      socket.off('new-message', handleNewMessage);
     };
   }, []);
 

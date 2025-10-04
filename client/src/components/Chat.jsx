@@ -17,14 +17,19 @@ export function Chat({ contact, onClose, currentUserId }) {
     loadMessages();
     markAsRead();
 
-    socket.on('new-message', handleNewMessage);
-    socket.on('user-typing', handleTyping);
-    socket.on('user-stop-typing', handleStopTyping);
+    // Set up socket listeners
+    const handleNewMessageWrapper = (message) => handleNewMessage(message);
+    const handleTypingWrapper = (data) => handleTyping(data);
+    const handleStopTypingWrapper = (data) => handleStopTyping(data);
+
+    socket.on('new-message', handleNewMessageWrapper);
+    socket.on('user-typing', handleTypingWrapper);
+    socket.on('user-stop-typing', handleStopTypingWrapper);
 
     return () => {
-      socket.off('new-message', handleNewMessage);
-      socket.off('user-typing', handleTyping);
-      socket.off('user-stop-typing', handleStopTyping);
+      socket.off('new-message', handleNewMessageWrapper);
+      socket.off('user-typing', handleTypingWrapper);
+      socket.off('user-stop-typing', handleStopTypingWrapper);
     };
   }, [contact.userId]);
 
@@ -166,8 +171,8 @@ export function Chat({ contact, onClose, currentUserId }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl h-[600px] flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-0 sm:p-4">
+      <div className="bg-white rounded-none sm:rounded-lg shadow-xl w-full h-full sm:max-w-2xl sm:h-[600px] flex flex-col">
         {/* Header */}
         <div className="bg-white shadow-md px-6 py-4 flex items-center justify-between rounded-t-lg border-b">
           <div className="flex items-center gap-4">
