@@ -123,7 +123,11 @@ export function useWebRTC(currentUserId) {
 
       console.log('Creating offer...');
       const offer = await pc.createOffer();
+      console.log('✅ Offer created successfully');
+      
+      console.log('Setting local description...');
       await pc.setLocalDescription(offer);
+      console.log('✅ Local description set successfully');
 
       console.log('Sending call to user:', contactId, 'from:', currentUserId);
       console.log('Offer SDP:', offer.sdp.substring(0, 100) + '...');
@@ -217,6 +221,30 @@ export function useWebRTC(currentUserId) {
 
   // Socket event handlers
   useEffect(() => {
+    const handleCallEnded = () => {
+      console.log('Call ended by remote user');
+      if (remoteUserId.current) {
+        socket.endCall(remoteUserId.current);
+      }
+      if (peerConnection.current) {
+        peerConnection.current.close();
+        peerConnection.current = null;
+      }
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+        setLocalStream(null);
+      }
+      setRemoteStream(null);
+      setIsCallActive(false);
+      setCallStatus('idle');
+      remoteUserId.current = null;
+    };
+
+    const handleCallRejected = () => {
+      console.log('Call rejected');
+      handleCallEnded();
+    };
+
     socket.on('incoming-call', ({ from, offer }) => {
       console.log('Incoming call from:', from);
       setIncomingCall({ from, offer });
@@ -244,15 +272,8 @@ export function useWebRTC(currentUserId) {
       }
     });
 
-    socket.on('call-ended', () => {
-      console.log('Call ended by remote user');
-      endCall();
-    });
-
-    socket.on('call-rejected', () => {
-      console.log('Call rejected');
-      endCall();
-    });
+    socket.on('call-ended', handleCallEnded);
+    socket.on('call-rejected', handleCallRejected);
 
     return () => {
       socket.off('incoming-call');
@@ -261,14 +282,19 @@ export function useWebRTC(currentUserId) {
       socket.off('call-ended');
       socket.off('call-rejected');
     };
-  }, [endCall]);
+  }, [localStream]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      endCall();
+      if (peerConnection.current) {
+        peerConnection.current.close();
+      }
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+      }
     };
-  }, [endCall]);
+  }, [localStream]);
 
   return {
     localStream,
