@@ -111,6 +111,12 @@ export function useWebRTC(currentUserId) {
 
   // Start a call
   const startCall = useCallback(async (contactId) => {
+    // Prevent multiple simultaneous calls
+    if (callStatus !== 'idle') {
+      console.log('⚠️ Call already in progress, ignoring duplicate call attempt');
+      return;
+    }
+
     try {
       console.log('Starting call to:', contactId);
       setCallStatus('calling');
@@ -138,7 +144,7 @@ export function useWebRTC(currentUserId) {
       setCallStatus('idle');
       throw error;
     }
-  }, [currentUserId, initializeMedia, createPeerConnection]);
+  }, [currentUserId, initializeMedia, createPeerConnection, callStatus]);
 
   // Accept incoming call
   const acceptCall = useCallback(async () => {
