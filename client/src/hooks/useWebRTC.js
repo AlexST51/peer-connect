@@ -129,8 +129,23 @@ export function useWebRTC(currentUserId) {
       const pc = createPeerConnection(stream);
 
       console.log('Creating offer...');
-      const offer = await pc.createOffer();
-      console.log('✅ Offer created successfully');
+      let offer;
+      try {
+        const offerPromise = pc.createOffer();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('createOffer timeout after 5s')), 5000)
+        );
+        
+        offer = await Promise.race([offerPromise, timeoutPromise]);
+        console.log('✅ Offer created successfully');
+        console.log('Offer type:', offer.type);
+        console.log('Offer SDP length:', offer.sdp?.length);
+      } catch (err) {
+        console.error('❌ Error creating offer:', err);
+        console.error('Peer connection state:', pc.connectionState);
+        console.error('Signaling state:', pc.signalingState);
+        throw err;
+      }
       
       console.log('Setting local description...');
       try {
