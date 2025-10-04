@@ -134,10 +134,20 @@ export function useWebRTC(currentUserId) {
       
       console.log('Setting local description...');
       try {
-        await pc.setLocalDescription(offer);
+        // Add timeout to detect if setLocalDescription hangs
+        const setLocalDescPromise = pc.setLocalDescription(offer);
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('setLocalDescription timeout after 5s')), 5000)
+        );
+        
+        await Promise.race([setLocalDescPromise, timeoutPromise]);
         console.log('✅ Local description set successfully');
+        console.log('Local description type:', pc.localDescription?.type);
+        console.log('Signaling state after setLocalDescription:', pc.signalingState);
       } catch (err) {
         console.error('❌ Error setting local description:', err);
+        console.error('Peer connection state:', pc.connectionState);
+        console.error('Signaling state:', pc.signalingState);
         throw err;
       }
 
